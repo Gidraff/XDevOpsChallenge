@@ -19,23 +19,23 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "node01" do |node01|
-    node01.vm.network "forwarded_port", guest: 80, host: 8000, host_ip: "0.0.0.0"
+    node01.vm.network "forwarded_port", guest: 80, host: 8000, host_ip: "127.0.0.1"
     node01.vm.network :private_network, ip: "192.168.56.3"
     node01.vm.hostname = "node01"
     node01.vm.network "forwarded_port", id: "ssh", host: 2201, guest: 22
   end
 
-  # config.vm.define "node02" do |node02|
-  #   node02.vm.network "forwarded_port", guest: 80, host: 8001, host_ip: "127.0.0.1"
-  #   node02.vm.network :private_network, ip: "192.168.56.4"
-  #   node02.vm.hostname = "node02"
-  #   node02.vm.network "forwarded_port", id: "ssh", host: 2202, guest: 22
-  # end
+  config.vm.define "node02" do |node02|
+    node02.vm.network "forwarded_port", guest: 80, host: 8001, host_ip: "127.0.0.1"
+    node02.vm.network :private_network, ip: "192.168.56.4"
+    node02.vm.hostname = "node02"
+    node02.vm.network "forwarded_port", id: "ssh", host: 2202, guest: 22
+  end
 
-  # config.vm.define "node03" do |node03|
-  #   node03.vm.network "forwarded_port", guest: 80, host: 8002, host_ip: "127.0.0.1"
-  #   node03.vm.network :private_network, ip: "192.168.56.5"
-  #   node03.vm.hostname = "node03"
-  #   node03.vm.network "forwarded_port", id: "ssh", host: 2203, guest: 22
-  # end
+  config.vm.define "node03" do |node03|
+    node03.vm.network "forwarded_port", guest: 80, host: 8002, host_ip: "127.0.0.1"
+    node03.vm.network :private_network, ip: "192.168.56.5"
+    node03.vm.hostname = "node03"
+    node03.vm.network "forwarded_port", id: "ssh", host: 2203, guest: 22
+  end
 end
