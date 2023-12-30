@@ -1,0 +1,31 @@
+# note: the IP addresses used by these VMs may need some configuration for MacOS
+# create this file /etc/vbox/networks.conf with content:
+# * 10.0.0.0/8 192.168.0.0/16
+# * 2001::/64
+# https://www.virtualbox.org/manual/ch06.html#network_hostonly
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "starboard/ubuntu-arm64-20.04.5"
+  config.vm.box_version = "20221120.20.40.0"
+  config.vm.box_download_insecure = true
+  config.vm.provider "vmware_desktop" do |v|
+      v.ssh_info_public = true
+      v.gui = true
+      v.linked_clone = false
+      v.vmx["ethernet0.virtualdev"] = "vmxnet3"
+  end
+
+  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+
+  config.vm.define "node01" do |node01|
+    node01.vm.hostname = "node01"
+  end
+
+  config.vm.define "node02" do |node02|
+    node02.vm.hostname = "node02"
+  end
+
+  config.vm.define "node03" do |node03|
+    node03.vm.hostname = "node03"
+  end
+end

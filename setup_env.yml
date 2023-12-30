@@ -1,0 +1,67 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Create VM user
+      user:
+        name: mimi
+        shell: /bin/bash
+        createhome: yes
+        groups: sudo
+        password_lock: yes
+
+    - name: Copy SSH public key for mimi
+      authorized_key:
+        user: mimi
+        key: "{{ lookup('file', './keys/mimi_key.pub') }}"
+
+    - name: Update and upgrade apt packages
+      become: yes
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Add user mimi to the docker group
+      user:
+        name: mimi
+        groups: docker
+        append: yes
+
+    - name: Ensure the nginx directory exists
+      file:
+        path: /home/mimi/nginx-conf
+        state: directory
+
+    - name: Copy nginx.conf to mimi's home directory
+      copy:
+        src: ./nginx-conf/nginx.conf
+        dest: /home/mimi/nginx-conf/nginx.conf
+
+    - name: Copy Docker Compose file to mimi's home directory
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/mimi/docker-compose.yml
+        owner: mimi
+        group: mimi
+
+    - name: Check if Docker is installed and running
+      stat:
+        path: /usr/bin/docker
+      register: docker_installed
+
+    - name: Run Docker Compose if Docker is installed and running
+      command: docker-compose -f /home/mimi/docker-compose.yml up -d
+      args:
+        chdir: /home/mimi
+      when: docker_installed.stat.exists

@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+  webapp:
+    image: gidraff/demo-web:v4
+    deploy:
+      replicas: 15
+      restart_policy:
+        max_attempts: 3
+        condition: on-failure       
+      update_config:
+        parallelism: 3
+        delay: 10s
+    environment:
+      MONGO_CONNECTION_URI: "mongodb://mongo:27017/"
+    networks:
+      - nw_database
+      - nw_web
+    ports:
+      - 3000:3000
+
+  mongo:
+    image: mongo:latest
+    deploy:
+      replicas: 10
+    networks:
+      - nw_database
+
+  nginx:
+    image: nginx:latest
+    networks:
+      - nw_web
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx-conf/:/etc/nginx/conf.d/
+      - /var/logs/app1/errors.log:/var/log/nginx/errors.log
+    depends_on:
+      - webapp
+
+networks:
+  nw_database:
+    internal: true
+  nw_web:
+    driver: bridge 
